@@ -12,20 +12,9 @@
 #
 
 require_relative 'prompts/prompts'
+require_relative 'helpers/printer'
 
-class Putter
-  #singleton
-#  def put(str, indent=
-end
-
-def put_break(l=20)
-  puts '-' * l
-end
-
-def put_newline
-  puts "\n"
-end
-
+Printer.print_title "welcome to this shit"
 
 prompt = CommandPrompt
 state = {}
