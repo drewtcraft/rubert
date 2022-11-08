@@ -29,7 +29,7 @@ class Ledger
 
   def write
     File.open("#{@name}.yml", 'w') do |h| 
-      h.write self.instance_values.to_yaml
+      h.write self.instance_eval().to_yaml
     end
   end
 

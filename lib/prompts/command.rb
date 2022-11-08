@@ -9,6 +9,10 @@ module CommandRegExp
 end
 
 class CommandPrompt < Prompt
+  def initialize(l)
+    super(l)
+  end
+
   def get_next_prompt
     Printer.puts_indented "current ledger \"#{@ledger.name}\""
     Printer.puts_dashes

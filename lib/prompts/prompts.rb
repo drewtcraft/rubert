@@ -2,11 +2,12 @@ require_relative 'utils'
 require_relative '../helpers/printer'
 require 'yaml'
 require_relative './command'
+require_relative './record'
 require_relative './base'
 
 PROMPTS = {
   command: CommandPrompt,
-  :new_record: NewRecordPrompt
+  new_record: NewRecordPrompt
 }
 
 class NewLedgerPrompt < Prompt

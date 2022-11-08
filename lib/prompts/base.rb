@@ -1,5 +1,6 @@
 class Prompt
   def initialize(ledger)
+    puts 'donk', ledger
     @ledger = ledger
   end
 

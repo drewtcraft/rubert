@@ -7,7 +7,7 @@ CONFIG_FILE_NAME = 'config.yml'
 
 def print_title
   Printer.clear
-  Printer.puts_in_box "BOOKEEPER"
+  Printer.puts_in_box "RUBERT"
   Printer.puts_newline
 end
 
@@ -41,11 +41,12 @@ def ensure_ledger
     new_ledger
   else
     Printer.log "ledger \"#{ledger_name}\" loaded from memory"
-    YAML.load_file(ledger_file_name)
+    Ledger.from_file ledger_file_name
   end
 end
 
 def init
+  print_title
   ledger = ensure_ledger
 
   Printer.puts_newline
