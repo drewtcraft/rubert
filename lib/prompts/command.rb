@@ -1,39 +1,85 @@
 require_relative './base'
+module CommandPrompt
+  module CommandRegExp
+    EXIT = /^\s?exit/i
+    QUIT = /^\s?quit/i
+    HELP = /^\s?help/i
+    HISTORY = /^\s?his(?:tory)?/
 
-module CommandRegExp
-  EXIT = /^\s?exit/i
-  QUIT = /^\s?quit/i
-  RECORD_NEW = /^\s?rec[ord]?\s?new/i
-  LEDGER_NEW = /^\s?le[dger]?\s?new/i
-  HELP = /^\s?help/i
-end
+    TASK_NEW = /^\s?ta(?:sk)?\snew/i
+    TASK_LIST = /^\s?ta(?:sk)?\slist/i
+    TASK_DONE = /^\s?ta(?:sk)?\sdone/i
+    TASK_EDIT = /^\s?ta(?:sk)?\sedit/i
+    TASK_DEL = /^\s?ta(?:sk)?\sdel/i
 
-class CommandPrompt < Prompt
-  def initialize(l)
-    super(l)
+    RECORD_NEW = /^\s?rec(?:ord)?\snew/i
+    RECORD_LIST = /^\s?rec(?:ord)?\slist/i
+    RECORD_SHOW = /^\s?rec(?:ord)?\sshow/i
+    RECORD_EDIT = /^\s?rec(?:ord)?\sedit/i
+    RECORD_DEL = /^\s?rec(?:ord)?\sdel/i
+
+    LEDGER_NEW = /^\s?le(?:dger)?\snew/i
+    LEDGER_LIST = /^\s?le(?:dger)?\slist/i
+    LEDGER_SWITCH = /^\s?le(?:dger)?\sswitch/i
+    LEDGER_DEL = /^\s?le(?:dger)?\sdel/i
   end
 
-  def get_next_prompt
-    Printer.puts_indented "current ledger \"#{@ledger.name}\""
-    Printer.puts_dashes
-    puts "COMMAND"
-    puts "enter COMMAND (\"help\" for list of commands):"
-    input = gets
-    Printer.puts_newline
-    Printer.puts_dashes
+  class CommandPrompt < Prompt
+    TITLE = 'COMMAND'
+    def self.next_prompt_type(ledger, state)
+      super
 
-    case input
-    when CommandRegExp::EXIT, CommandRegExp::QUIT
-      exit 0
-    when CommandRegExp::RECORD_NEW
-      :new_record
-    when CommandRegExp::HELP
-      Printer.clear
-      puts '"r[ec[ord]] [new|list]", "exit", "quit"'
-      self.class
-    else
-      puts "#{input} is not a command, try typing \"help\""
-      self.class
+      Printer.puts_indented "current ledger \"#{ledger.name}\""
+      Printer.puts_dashes
+      puts "enter COMMAND (\"help\" for list of commands):"
+
+      input = gets
+
+      state[:last_commands] << input
+      state[:args] = input.sub(/^[^\s]+\s+[^\s]+\s/, '').split(' ')
+
+      Printer.puts_newline
+      Printer.puts_dashes
+
+      case input
+      when CommandRegExp::EXIT, CommandRegExp::QUIT
+        :exit
+      when CommandRegExp::HELP
+        :help
+      when CommandRegExp::HISTORY
+        :history
+
+      when CommandRegExp::RECORD_NEW
+        :record_new
+      when CommandRegExp::RECORD_SHOW
+        :record_show
+      when CommandRegExp::RECORD_LIST
+        :record_list
+      when CommandRegExp::RECORD_EDIT
+        :record_edit
+      when CommandRegExp::RECORD_DEL
+        :record_del
+
+      when CommandRegExp::TASK_NEW
+        :task_new
+      when CommandRegExp::TASK_LIST
+        :task_list
+      when CommandRegExp::TASK_DONE
+        :task_done
+      when CommandRegExp::TASK_EDIT
+        :task_edit
+      when CommandRegExp::TASK_DEL
+        :task_del
+
+      else
+        if input == ""
+          input = "<empty-string>"
+        end
+        puts "#{input} is not a command, try typing \"help\""
+        :command
+      end
     end
   end
+
+  MAPPINGS = {command: CommandPrompt}
 end

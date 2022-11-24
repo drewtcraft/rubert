@@ -1,6 +1,16 @@
-INDENT_LEVEL = 2
+alias standard_puts puts
 
-class Printer
+module Printer
+  INDENT_LEVEL = 2
+  LIST_RECORD_TRUNCATE = 60
+  TIME_DATE_FORMAT = '%m/%d/%Y %I:%M%p'
+
+  private_constant :INDENT_LEVEL, :LIST_RECORD_TRUNCATE, :TIME_DATE_FORMAT
+
+  def self.puts(s)
+    standard_puts s
+  end
+
   def self.puts_dashes(l=20)
     puts '-' * l
   end
@@ -33,35 +43,38 @@ class Printer
   end
 
   def self.puts_new_record(r)
-    Printer.puts_indented 'RECORD ADDED'
-    Printer.puts_dashes
+    puts_indented 'RECORD ADDED'
+    puts_dashes
     puts r.body
     puts "tags: #{r.tags}"
     puts r.created_at
-    Printer.puts_dashes
+    puts_dashes
   end
 
   def self.puts_new_task(t)
-    Printer.puts_indented 'TASK ADDED'
-    Printer.puts_dashes
+    puts_indented 'TASK ADDED'
+    puts_dashes
     puts t.body
     puts t.created_at
-    Printer.puts_dashes
+    puts_dashes
   end
 
   def self.puts_prompt_title(t)
-    Printer.puts_dashes
+    puts_dashes
     puts t
   end
 
-  def self.puts_list_record(r)
-    puts "#{r.id}:[#{r.created_at}] |#{r.tags.join(', ')}| -- #{r.body[0..40]}..."
-    Printer.puts_dashes
+  def self.puts_list_record(r, i)
+    if r.body.length > 60
+      puts "[#{i}] #{r.body[0..60]}... #{r.created_at.strftime(TIME_DATE_FORMAT)}"
+    else
+      puts "[#{i}] #{r.body} #{r.created_at.strftime('%m/%d/%Y %I:%M%p')}"
+    end
   end
 
   def self.puts_full_record(r)
-    puts r.created_at
     puts r.body
+    puts r.created_at
     puts "TAGGED: #{r.tags.join(', ')}"
   end
 end

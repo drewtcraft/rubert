@@ -1,4 +1,4 @@
-require_relative 'prompts/prompts'
+require_relative 'prompts/main'
 require_relative 'helpers/printer'
 require_relative 'models/Ledger'
 require 'yaml'
@@ -41,7 +41,7 @@ def ensure_ledger
     new_ledger
   else
     Printer.log "ledger \"#{ledger_name}\" loaded from memory"
-    Ledger.from_file ledger_file_name
+    Ledger.from_file ledger_name
   end
 end
 
@@ -51,11 +51,10 @@ def init
 
   Printer.puts_newline
 
-  prompt = CommandPrompt
+  state = {last_commands: []}
+  prompt_type = :command
   loop do
-    prompt_instance = prompt.new(ledger)
-    prompt_type = prompt_instance.get_next_prompt
-    prompt = PROMPTS[prompt_type]
+    prompt_type = PROMPTS[prompt_type].next_prompt_type(ledger, state)
   end
 end
 

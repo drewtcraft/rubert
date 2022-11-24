@@ -1,50 +1,91 @@
 require_relative './base'
+require_relative '../models/Record'
 
-class NewRecordPrompt < Prompt
-  def get_next_prompt
-    Printer.clear
-    Printer.puts_prompt_title 'NEW RECORD'
+module RecordPrompt
+  class New < Prompt
+    TITLE = 'NEW RECORD'
+    def self.next_prompt_type(ledger, state)
+      super
 
-    body = get_body
-    tags = get_tags
+      body = get_body
+      tags = get_tags
 
-    record = Record.new_from_parts(body, tags)
-    @ledger.add_record record
+      record = Record.new_from_parts(body, tags)
+      ledger.append_record record
 
-    Printer.clear
-    Printer.puts_new_record record
+      Printer.puts_new_record record
 
-    CommandPrompt
-  end
-
-  private
-
-  def get_body
-    puts "enter new record (return twice to finish writing):"
-    body = multiline_gets
-    if body == ""
-      multiline_gets
+      :command
     end
-    body
+
+    private
+
+    def self.get_body
+      puts "enter new record (return twice to finish writing):"
+      Input.multiline_gets
+    end
+
+    def self.get_tags
+      puts 'enter comma-separated tags (e.g. "code, 2142, ..."):'
+      tags = Input.one_line_gets
+      tags.split(',')
+        .map {|t| t.strip}
+        .select {|t| t != ''}
+    end
   end
 
-  def get_tags
-    puts 'enter comma-separated tags (e.g. "code, 2142, ..."):'
-    tags = gets
-    tags = tags.split(',')
-      .map {|t| t.strip}
-      .select {|t| t != ''}
-    tags
+  class Show < Prompt
+    TITLE = 'RECORD SHOW'
+    def self.next_prompt_type(ledger, state)
+      super
+      tmp_id = state[:args].first.to_i
+      record = ledger.records[tmp_id]
+      Printer.puts_full_record record
+      :command
+    end
   end
-end
 
-class EditRecordPrompt < Prompt
-  DEFAULT_INPUT_TYPE = InputTypes::EDITOR
-  def get_next_prompt
+
+  class Edit < Prompt
+    TITLE = 'RECORD EDIT'
+    def self.next_prompt_type(ledger, state)
+      super
+      tmp_id = state[:args].first.to_i
+      record = ledger.records[tmp_id]
+      new_body = Input.editor_edits record.body
+      ledger.records[tmp_id].update(body:new_body)
+      :command
+    end
   end
-end
 
-class ListRecordPrompt < Prompt
-  # load working file (into memory??)
+  class List < Prompt
+    TITLE = 'RECORD LIST'
+    def self.next_prompt_type(ledger, state)
+      super
+      ledger.records
+        .reverse
+        .each_with_index
+        .to_a
+        .reverse
+        .each{|r, i| Printer.puts_list_record(r, i) }
 
+      :command
+    end
+  end
+
+  class Delete < Prompt
+    def self.next_prompt_type(ledger, state)
+      super
+      # TODO
+      :command
+    end
+  end
+
+  MAPPINGS = {
+    record_new: New,
+    record_list: List,
+    record_show: Show,
+    record_edit: Edit,
+    record_del: Delete,
+  }
 end

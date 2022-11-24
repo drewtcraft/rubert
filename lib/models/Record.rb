@@ -1,17 +1,43 @@
 require 'securerandom'
+require_relative './base'
 
-class Record
-  attr_reader :id, :body, :tags, :created_at
+class Record < Timestamped
+  attr_reader :id, :body, :tags
 
   def initialize(params)
+    super 
     @id = params[:id]
     @body = params[:body]
     @tags = params[:tags]
-    @created_at = params[:created_at]
   end
 
-  def new_from_parts(body, tags)
-    created_at = Time.now
-    Record.new {id: SecureRandom.uuid, body:, tags:, created_at:}
+  def self.new_from_parts(body, tags)
+    updated_at = created_at = Time.now
+    Record.new ({
+      id: SecureRandom.uuid, 
+      body:, 
+      tags:, 
+      created_at:,
+      updated_at:,
+    })
+  end
+
+  def update(body: nil, tags: nil)
+    super()
+    if body
+      @body = body
+    elsif tags
+      @tags = tags
+    end
+  end
+
+  def to_hash
+    {
+      id: @id,
+      body: @body,
+      tags: @tags,
+      created_at: @created_at,
+      update_at: @updated_at,
+    }
   end
 end
