@@ -1,20 +1,22 @@
 require_relative 'prompts/main'
-require_relative 'helpers/printer'
+require_relative 'helpers/output'
 require_relative 'models/Ledger'
+require_relative 'models/State'
 require 'yaml'
 
 CONFIG_FILE_NAME = 'config.yml'
 
-def print_title
-  Printer.clear
-  Printer.puts_in_box "RUBERT"
-  Printer.puts_newline
+def print_title # TODO aka welcomeprompt
+  Output.clear
+  Output.puts_in_box "RUBERT"
+  Output.puts_newline
 end
 
+# TODO move all this logic to prompts!!
 def get_ledger_name()
   if not File.exists? CONFIG_FILE_NAME
-    Printer.log 'config.yml not found'
-    Printer.log 'creating config.yml'
+    Output.log 'config.yml not found'
+    Output.log 'creating config.yml'
     puts 'enter a ledger name (e.g. "JOURNAL")'
     _ledger_name = gets.strip
     _config = {
@@ -37,10 +39,10 @@ def ensure_ledger
   if not File.exists? ledger_file_name
     new_ledger = Ledger.from_name ledger_name
     new_ledger.write
-    Printer.log "created and saved new ledger \"#{ledger_name}\""
+    Output.log "created and saved new ledger \"#{ledger_name}\""
     new_ledger
   else
-    Printer.log "ledger \"#{ledger_name}\" loaded from memory"
+    Output.log "ledger \"#{ledger_name}\" loaded from memory"
     Ledger.from_file ledger_name
   end
 end
@@ -49,12 +51,14 @@ def init
   print_title
   ledger = ensure_ledger
 
-  Printer.puts_newline
+  Output.puts_newline
 
-  state = {last_commands: []}
+  state = State.new
   prompt_type = :command
   loop do
-    prompt_type = PROMPTS[prompt_type].next_prompt_type(ledger, state)
+    prompt = PROMPTS[prompt_type]
+    prompt_type = prompt.next_prompt_type(ledger, state)
+    state.soft_reset!
   end
 end
 

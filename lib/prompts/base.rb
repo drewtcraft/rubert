@@ -1,10 +1,12 @@
-require_relative '../helpers/printer'
+require_relative '../helpers/output'
 
 class Prompt
-  TITLE = 'something went wrong'
+  TITLE = nil
 
   def self.next_prompt_type(ledger=nil, state=nil)
-    Printer.puts_prompt_title self::TITLE
+    if self::TITLE 
+      Output.puts_prompt_title self::TITLE
+    end
     :exit
   end
 end
@@ -22,10 +24,10 @@ module GeneralPrompt
     def self.next_prompt_type(ledger, state)
       super
       puts "AVAILABLE COMMANDS"
-      Printer.log "[exit|quit]"
-      Printer.log "his(tory)"
-      Printer.log "rec(ord) [new|list|edit|del]"
-      Printer.log "le(dger) [new|switch|del]"
+      Output.log "[exit|quit]"
+      Output.log "his(tory)"
+      Output.log "rec(ord) [new|list|edit|del]"
+      Output.log "le(dger) [new|switch|del]"
       :command
     end
   end
@@ -34,7 +36,7 @@ module GeneralPrompt
     TITLE = "HISTORY"
     def self.next_prompt_type(ledger, state)
       super
-      Printer.log "last 10"
+      Output.log "last 10"
       state[:last_commands].each {|cmd| puts cmd}
       :command
     end

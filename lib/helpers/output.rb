@@ -1,6 +1,6 @@
 alias standard_puts puts
 
-module Printer
+module Output
   INDENT_LEVEL = 2
   LIST_RECORD_TRUNCATE = 60
   TIME_DATE_FORMAT = '%m/%d/%Y %I:%M%p'
@@ -8,6 +8,7 @@ module Printer
   private_constant :INDENT_LEVEL, :LIST_RECORD_TRUNCATE, :TIME_DATE_FORMAT
 
   def self.puts(s)
+    return unless s 
     standard_puts s
   end
 
@@ -55,6 +56,7 @@ module Printer
     puts_indented 'TASK ADDED'
     puts_dashes
     puts t.body
+    puts t.priority
     puts t.created_at
     puts_dashes
   end
@@ -76,5 +78,9 @@ module Printer
     puts r.body
     puts r.created_at
     puts "TAGGED: #{r.tags.join(', ')}"
+  end
+
+  def self.puts_list_task(t, i)
+    puts "[#{i}] #{t.body} #{t.priority}"
   end
 end

@@ -1,4 +1,5 @@
 require_relative './base'
+
 module CommandPrompt
   module CommandRegExp
     EXIT = /^\s?exit/i
@@ -6,11 +7,11 @@ module CommandPrompt
     HELP = /^\s?help/i
     HISTORY = /^\s?his(?:tory)?/
 
-    TASK_NEW = /^\s?ta(?:sk)?\snew/i
-    TASK_LIST = /^\s?ta(?:sk)?\slist/i
-    TASK_DONE = /^\s?ta(?:sk)?\sdone/i
-    TASK_EDIT = /^\s?ta(?:sk)?\sedit/i
-    TASK_DEL = /^\s?ta(?:sk)?\sdel/i
+    TASK_NEW = /^\s?t(?:ask)?\snew/i
+    TASK_LIST = /^\s?t(?:ask)?\slist/i
+    TASK_DONE = /^\s?t(?:ask)?\sdone/i
+    TASK_EDIT = /^\s?t(?:ask)?\sedit/i
+    TASK_DEL = /^\s?t(?:ask)?\sdel/i
 
     RECORD_NEW = /^\s?rec(?:ord)?\snew/i
     RECORD_LIST = /^\s?rec(?:ord)?\slist/i
@@ -29,17 +30,16 @@ module CommandPrompt
     def self.next_prompt_type(ledger, state)
       super
 
-      Printer.puts_indented "current ledger \"#{ledger.name}\""
-      Printer.puts_dashes
-      puts "enter COMMAND (\"help\" for list of commands):"
+      Output.puts_indented "current ledger \"#{ledger.name}\""
+      Output.puts_dashes
+      Output.puts "enter COMMAND (\"help\" for list of commands):"
 
       input = gets
 
-      state[:last_commands] << input
-      state[:args] = input.sub(/^[^\s]+\s+[^\s]+\s/, '').split(' ')
-
-      Printer.puts_newline
-      Printer.puts_dashes
+      state.append_command! input
+      state.extract_args_from_command! input
+      Output.puts_newline
+      Output.puts_dashes
 
       case input
       when CommandRegExp::EXIT, CommandRegExp::QUIT
@@ -75,7 +75,7 @@ module CommandPrompt
         if input == ""
           input = "<empty-string>"
         end
-        puts "#{input} is not a command, try typing \"help\""
+        Output.puts "#{input} is not a command, try typing \"help\""
         :command
       end
     end

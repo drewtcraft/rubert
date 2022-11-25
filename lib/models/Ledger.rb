@@ -1,6 +1,6 @@
 require 'securerandom'
 require_relative './base'
-require_relative '../helpers/printer'
+require_relative '../helpers/output'
 
 class Ledger < Timestamped
   attr_reader :name, :records, :tasks, :created_at, :updated_at
@@ -13,12 +13,13 @@ class Ledger < Timestamped
   end
 
   def self.from_name(name)
+    created_at = updated_at = Time.now
     Ledger.new({
       name:, 
       records: [], 
       tasks: [], 
-      created_at: Time.now,
-      updated_at: Time.now,
+      created_at:,
+      updated_at:,
     })
   end
 
@@ -55,22 +56,17 @@ class Ledger < Timestamped
   end
 
   def list_records(filter)
+    records = @records.clone
     @records.each do |r|
       Printer.puts_list_record r
     end
   end
 
-  def edit_record(record_id)
+  def edit_record(record)
   end
 
   def append_task(task)
     @tasks << task
     write
-  end
-
-  def list_tasks(format)
-    @tasks.each do |t|
-      Printer.puts_list_task t
-    end
   end
 end
