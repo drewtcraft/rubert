@@ -37,12 +37,16 @@ module GeneralPrompt
     def self.next_prompt_type(ledger, state)
       super
       Output.log "last 10"
-      state[:last_commands].each {|cmd| puts cmd}
+      state.last_commands.each {|cmd| Output.puts cmd}
       :command
     end
   end
 
   MAPPINGS = {
+    exit: ExitPrompt,
+    quit: ExitPrompt,
+    history: HistoryPrompt,
+    help: HelpPrompt,
 
   }
 end

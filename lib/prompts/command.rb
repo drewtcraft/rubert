@@ -34,7 +34,7 @@ module CommandPrompt
       Output.puts_dashes
       Output.puts "enter COMMAND (\"help\" for list of commands):"
 
-      input = gets
+      input = Input.gets
 
       state.append_command! input
       state.extract_args_from_command! input

@@ -18,15 +18,21 @@ module TaskPrompt
       task = Task.new_from_parts(body, tags)
       ledger.append_record record
 
-      Output.puts_new_record record
+      Output.puts_new_task task
 
       :command
     end
-    
+
     private
 
     def self.get_priority
-      Output.
+      Output.puts "enter a priority (default #{Task::DEFAULT_PRIORITY})"
+      if (priority = Input.gets)
+        priority.chomp!.to_i
+      else
+        Task::DEFAULT_PRIORITY
+      end
+    end
   end
 
   class List < Prompt

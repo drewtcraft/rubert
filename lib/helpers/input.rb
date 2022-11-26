@@ -6,24 +6,26 @@ module Input
   private_constant :TEMP_FILE_NAME
 
   def self.gets
-    standard_gets
+    standard_gets.chomp
   end
 
   def self.one_line_gets
-    # almost just an alias for gets but can also open vim
-    if (text = gets) == "editor\n"
+    # almost just an alias for gets but can also open the EDITOR
+    if (text = gets) == "editor"
       editor_gets
     end
     text
   end
 
   def self.multiline_gets
+    # TODO this is broken after adding chomp to gets
+
     # like "gets", but concats all content entered until a blank newline
     # can open vim as well
 
     all_text = ""
     used_editor = false
-    while (text = gets) != "\n"
+    while (text = standard_gets) != "\n"
       if text == "editor\n"
         used_editor = true
         all_text = editor_gets

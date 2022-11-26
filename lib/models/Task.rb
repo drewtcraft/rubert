@@ -2,6 +2,7 @@ require 'securerandom'
 require_relative './Record'
 
 class Task < Record
+  DEFAULT_PRIORITY = 5
   def initialize(params)
     super 
     @priority = params[:priority]

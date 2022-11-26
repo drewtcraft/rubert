@@ -24,7 +24,7 @@ class Ledger < Timestamped
   end
 
   def self.from_file(name)
-    l = YAML.load_file("#{name}.yml", permitted_classes: [Symbol, Time])
+    l = YAML.load_file("#{name}.yml", permitted_classes: [Symbol, Time], aliases: true)
     Ledger.new l
   end
 
@@ -45,7 +45,7 @@ class Ledger < Timestamped
   end
 
   def save_new_record(record)
-    Printer.puts_new_record record
+    Output.puts_new_record record
     @records << record
     write
   end
@@ -56,9 +56,8 @@ class Ledger < Timestamped
   end
 
   def list_records(filter)
-    records = @records.clone
     @records.each do |r|
-      Printer.puts_list_record r
+      Output.puts_list_record r
     end
   end
 

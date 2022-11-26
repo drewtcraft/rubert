@@ -2,8 +2,8 @@ alias standard_puts puts
 
 module Output
   INDENT_LEVEL = 2
-  LIST_RECORD_TRUNCATE = 60
-  TIME_DATE_FORMAT = '%m/%d/%Y %I:%M%p'
+  LIST_RECORD_TRUNCATE = 30
+  TIME_DATE_FORMAT = '%m/%d/%y %I:%M%p'
 
   private_constant :INDENT_LEVEL, :LIST_RECORD_TRUNCATE, :TIME_DATE_FORMAT
 
@@ -67,11 +67,14 @@ module Output
   end
 
   def self.puts_list_record(r, i)
-    if r.body.length > 60
-      puts "[#{i}] #{r.body[0..60]}... #{r.created_at.strftime(TIME_DATE_FORMAT)}"
+    body = if r.body[0..LIST_RECORD_TRUNCATE].match("\n")
+      r.body[0..LIST_RECORD_TRUNCATE].split("\n")[0]
+    elsif r.body.length > LIST_RECORD_TRUNCATE
+      "#{r.body[0..LIST_RECORD_TRUNCATE]}..."
     else
-      puts "[#{i}] #{r.body} #{r.created_at.strftime('%m/%d/%Y %I:%M%p')}"
+      r.body
     end
+    puts "[" + ("%02d" % i) + "] #{body}".ljust(LIST_RECORD_TRUNCATE) + "#{r.created_at.strftime(TIME_DATE_FORMAT).rjust(5)}"
   end
 
   def self.puts_full_record(r)

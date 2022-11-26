@@ -4,8 +4,8 @@ require_relative '../models/Record'
 
 module RecordPrompt
   class New < Prompt
-    include GetBody
-    include GetTags
+    extend GetBody
+    extend GetTags
 
     TITLE = 'NEW RECORD'
 
@@ -16,7 +16,7 @@ module RecordPrompt
       tags = get_tags
 
       record = Record.new_from_parts(body, tags)
-      ledger.append_record record
+      ledger.save_new_record record
 
       Output.puts_new_record record
 

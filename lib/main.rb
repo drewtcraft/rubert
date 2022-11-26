@@ -12,13 +12,13 @@ def print_title # TODO aka welcomeprompt
   Output.puts_newline
 end
 
-# TODO move all this logic to prompts!!
+# TODO move all this logic to prompts??
 def get_ledger_name()
   if not File.exists? CONFIG_FILE_NAME
     Output.log 'config.yml not found'
     Output.log 'creating config.yml'
     puts 'enter a ledger name (e.g. "JOURNAL")'
-    _ledger_name = gets.strip
+    _ledger_name = Input.gets.strip
     _config = {
       last_ledger_name: _ledger_name
     }
@@ -40,9 +40,11 @@ def ensure_ledger
     new_ledger = Ledger.from_name ledger_name
     new_ledger.write
     Output.log "created and saved new ledger \"#{ledger_name}\""
+    Output.puts_newline
     new_ledger
   else
     Output.log "ledger \"#{ledger_name}\" loaded from memory"
+    Output.puts_newline
     Ledger.from_file ledger_name
   end
 end
@@ -51,7 +53,6 @@ def init
   print_title
   ledger = ensure_ledger
 
-  Output.puts_newline
 
   state = State.new
   prompt_type = :command

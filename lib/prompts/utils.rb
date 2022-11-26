@@ -1,5 +1,7 @@
+require_relative '../helpers/output'
+require_relative '../helpers/input'
+
 module GetBody
-  private
   def get_body(msg)
     Output.puts msg
     Input.multiline_gets
@@ -7,7 +9,6 @@ module GetBody
 end
 
 module GetTags
-  private
   def get_tags
     Output.puts "enter comma-separated tags:"
     tags = Input.one_line_gets
