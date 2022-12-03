@@ -20,34 +20,46 @@ module CommandPrompt
     RECORD_DEL = /^\s?rec(?:ord)?\sdel/i
 
     LEDGER_NEW = /^\s?le(?:dger)?\snew/i
+    LEDGER_SHOW = /^\s?le(?:dger)?\sshow/i
     LEDGER_LIST = /^\s?le(?:dger)?\slist/i
     LEDGER_SWITCH = /^\s?le(?:dger)?\sswitch/i
     LEDGER_DEL = /^\s?le(?:dger)?\sdel/i
   end
 
   class CommandPrompt < Prompt
-    TITLE = 'COMMAND'
-    def self.next_prompt_type(ledger, state)
+    def process
       super
 
-      Output.puts_indented "current ledger \"#{ledger.name}\""
-      Output.puts_dashes
-      Output.puts "enter COMMAND (\"help\" for list of commands):"
+      # could pass in a fake argument string here??? is that too hacky?
+      if @state.is_first_run
+        Output.log "current ledger \"#{@state.ledger.name}\""
+        Output.puts "enter COMMAND (\"help\" for list of commands):"
+        @state.is_first_run = false
+      else
+        Output.puts "enter COMMAND:"
+      end
 
       input = Input.gets
 
-      state.append_command! input
-      state.extract_args_from_command! input
-      Output.puts_newline
-      Output.puts_dashes
-
-      case input
+      @state.append_command! input
+      @next_prompt_type = case input
       when CommandRegExp::EXIT, CommandRegExp::QUIT
         :exit
       when CommandRegExp::HELP
         :help
       when CommandRegExp::HISTORY
         :history
+
+      when CommandRegExp::LEDGER_NEW
+        :ledger_new
+      when CommandRegExp::LEDGER_SHOW
+        :ledger_show
+      when CommandRegExp::LEDGER_LIST
+        :ledger_list
+      when CommandRegExp::LEDGER_SWITCH
+        :ledger_switch
+      when CommandRegExp::LEDGER_DEL
+        :ledger_delete
 
       when CommandRegExp::RECORD_NEW
         :record_new
@@ -58,7 +70,7 @@ module CommandPrompt
       when CommandRegExp::RECORD_EDIT
         :record_edit
       when CommandRegExp::RECORD_DEL
-        :record_del
+        :record_delete
 
       when CommandRegExp::TASK_NEW
         :task_new
@@ -69,7 +81,7 @@ module CommandPrompt
       when CommandRegExp::TASK_EDIT
         :task_edit
       when CommandRegExp::TASK_DEL
-        :task_del
+        :task_delete
 
       else
         if input == ""

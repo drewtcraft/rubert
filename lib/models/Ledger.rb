@@ -3,13 +3,18 @@ require_relative './base'
 require_relative '../helpers/output'
 
 class Ledger < Timestamped
-  attr_reader :name, :records, :tasks, :created_at, :updated_at
+  attr_reader :name, :records, :created_at, :updated_at
 
   def initialize(params)
     super params
     @name = params[:name]
-    @records = params[:records].map{|r| Record.new r}
-    @tasks = params[:tasks].map{|t| Task.new t}
+    @records = params[:records].map do |r|
+      if r.has_key? :priority
+        Task.new r
+      else
+        Record.new r
+      end
+    end
   end
 
   def self.from_name(name)
@@ -17,7 +22,6 @@ class Ledger < Timestamped
     Ledger.new({
       name:, 
       records: [], 
-      tasks: [], 
       created_at:,
       updated_at:,
     })
@@ -32,40 +36,29 @@ class Ledger < Timestamped
     {
       name: @name,
       records: @records.map{|r| r.to_hash},
-      tasks: @tasks.map{|t| t.to_hash},
       created_at: @created_at,
       updated_at: @updated_at,
     }
   end
 
-  def write
+  def write!
     File.open("#{@name}.yml", 'w') do |h| 
       h.write self.to_hash.to_yaml
     end
   end
 
-  def save_new_record(record)
-    Output.puts_new_record record
+  def save_new_record!(record)
     @records << record
-    write
+    write!
   end
 
-  def save_existing_record(record)
+  def save_existing_record!(record)
     @records = @records.map{|r| r.id === record.id ? record : r}
-    write
+    write!
   end
 
-  def list_records(filter)
-    @records.each do |r|
-      Output.puts_list_record r
-    end
-  end
-
-  def edit_record(record)
-  end
-
-  def append_task(task)
-    @tasks << task
-    write
+  def delete_record!(record_id)
+    @records = @records.select{|r| r.id === record_id}
+    write!
   end
 end

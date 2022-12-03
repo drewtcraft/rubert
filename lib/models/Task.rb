@@ -3,43 +3,35 @@ require_relative './Record'
 
 class Task < Record
   DEFAULT_PRIORITY = 5
+  attr_accessor :priority, :done
   def initialize(params)
     super 
     @priority = params[:priority]
-    @completed = params[:completed]
+    @done = params[:done]
   end
 
-  def update(priority: nil, completed: nil, body: nil, tags: nil)
+  def update(priority: nil, done: nil, body: nil, tags: nil)
     super(body:, tags:)
     if priority
       @priority = priority
-    elsif completed
-      @completed = completed
+    elsif done
+      @done = done
     end
   end
 
   def self.new_from_parts(body, tags, priority)
-    updated_at = created_at = Time.now
     self.new ({
-      id: SecureRandom.uuid, 
-      body:, 
-      tags:, 
       priority:,
-      created_at:,
-      updated_at:,
-      completed: false,
+      done: false,
+      **super(body, tags)
     })
   end
 
   def to_hash
     {
-      id: @id,
-      body: @body,
-      tags: @tags,
-      completed: @completed,
+      done: @done,
       priority: @priority,
-      created_at: @created_at,
-      updated_at: @updated_at
+      **super,
     }
   end
 end

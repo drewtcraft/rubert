@@ -38,13 +38,11 @@ def ensure_ledger
 
   if not File.exists? ledger_file_name
     new_ledger = Ledger.from_name ledger_name
-    new_ledger.write
+    new_ledger.write!
     Output.log "created and saved new ledger \"#{ledger_name}\""
-    Output.puts_newline
     new_ledger
   else
     Output.log "ledger \"#{ledger_name}\" loaded from memory"
-    Output.puts_newline
     Ledger.from_file ledger_name
   end
 end
@@ -53,13 +51,13 @@ def init
   print_title
   ledger = ensure_ledger
 
-
-  state = State.new
+  state = State.new ledger:
   prompt_type = :command
   loop do
-    prompt = PROMPTS[prompt_type]
-    prompt_type = prompt.next_prompt_type(ledger, state)
-    state.soft_reset!
+    prompt_ctor = PROMPTS[prompt_type]
+    prompt = prompt_ctor.new state
+    prompt.process
+    prompt_type = prompt.next_prompt_type
   end
 end
 
