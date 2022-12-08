@@ -94,14 +94,14 @@ module Output
     puts  " " + ("%02d" % i) + "#{r.class == Task ? " | p#{("%02d" % r.priority)} |" : ""} " + "#{body}".ljust(LIST_RECORD_TRUNCATE + 3) + (Format.gray "#{r.created_at.strftime(TIME_DATE_FORMAT)}")
   end
 
+  def self.puts_list_ledger(l, i)
+    puts "#{i} | #{l.split('.')[0]}"
+  end
+
   def self.puts_full_record(r)
     puts r.body
     puts "TAGGED: #{r.tags.join(', ')}"
     puts r.created_at.strftime(TIME_DATE_FORMAT)
-  end
-
-  def self.puts_list_task(t, i)
-    puts "[#{i}] #{t.body} #{t.priority}"
   end
 
   def self.puts_between_lines

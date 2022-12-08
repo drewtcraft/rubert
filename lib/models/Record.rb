@@ -14,7 +14,7 @@ class Record < Timestamped
   def self.new_from_parts(body, tags)
     updated_at = created_at = Time.now
     Record.new ({
-      id: SecureRandom.uuid, 
+      id: SecureRandom.alphanumeric(8),
       body:, 
       tags:, 
       created_at:,

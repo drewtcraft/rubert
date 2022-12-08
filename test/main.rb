@@ -1,4 +1,5 @@
 require "minitest/autorun"
+require_relative 'models/dels/Argument'
 
 class MainTest < Minitest::Test
   def setup

@@ -20,7 +20,7 @@ class Task < Record
   end
 
   def self.new_from_parts(body, tags, priority)
-    self.new ({
+    new({
       priority:,
       done: false,
       **super(body, tags)

@@ -1,44 +1,46 @@
+require_relative 'Arguments'
+
 class State
   # persists temp data between prompts
 
   attr_accessor :last_record_list, :last_task_list, :is_first_run, :ledger
-  attr_reader :arg_string, :last_commands
+  attr_reader :last_commands, :config
 
   def initialize(params = {})
     @ledger = params[:ledger]
+    @config = params[:config]
     @last_commands = []
 
-    @arg_string = nil
+    @last_ledger_list = nil
     @last_record_list = nil
     @last_task_list = nil
     @is_first_run = true
   end
 
-  def has_last_record_list?
-    @last_record_list != nil
-  end
-
-  def has_last_task_list?
-    @last_task_list != nil
-  end
-
-  def has_arg_string?
-    @arg_string != nil
+  def get_resource_by_index(type, index)
+    case type
+    when :ledger
+      @last_ledger_list[index]
+    when :record
+      @last_record_list[index]
+    when :task
+      @last_task_list[index]
+    end
   end
 
   def soft_reset!
-    @arg_string = nil
+    @arguments = nil
   end
 
   def hard_reset!
-    soft_reset
+    soft_reset!
     @last_record_list = nil
     @last_task_list = nil
+    @last_ledger_list = nil
     @is_first_run = true
   end
 
   def append_command!(c)
-    @arg_string = c
     @last_commands << c
   end
 end

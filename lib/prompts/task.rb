@@ -3,14 +3,111 @@ require_relative './utils'
 require_relative './record'
 require_relative '../models/Task'
 
-module TaskPrompt
-  module GetPriority
-    def get_priority
-      Output.puts "enter a priority"
-      if (priority = Input.gets) != ""
-        priority.to_i
-      end
+class TaskPrompt < RecordPrompt
+  def self.create(state, arguments)
+    body = get_body "enter new task:", false
+    tags = get_tags
+    priority = get_priority
+    priority ||= Task::DEFAULT_PRIORITY
+
+    task = Task.new_from_parts(body, tags, priority)
+    state.ledger.save_new_record! task
+
+    Output.puts_between_lines{ Output.puts_new_task task }
+
+  end
+
+  def self.show(state, arguments)
+    task = get_record(state, arguments, Task)
+
+    if task
+      Output.puts_dashes
+      Output.puts_full_task task
+      Output.puts_dashes
+    else
+      Output.error "missing task id \"task show <id|keyword>\"", :input_error
     end
+  end
+
+  def self.edit(state, arguments)
+    task = get_record(state, arguments, Task)
+    unless task
+      Output.error "could not find task"
+      return
+    end
+    task.body = Input.editor_edits task.body
+    task.priority = get_priority
+    state.ledger.save_existing_record! task
+    state.soft_reset!
+  end
+
+  def self.list(state, arguments)
+    tasks = state.ledger.tasks
+    tasks = filter_tasks(tasks, arguments)
+    tasks = slice_records tasks
+    state.last_task_list = tasks.reverse
+    tasks = index_records tasks
+
+    Output.puts_between_lines do
+      tasks.each{ |r, i| Output.puts_list_record(r, i) }
+    end
+
+    state.soft_reset!
+  end
+
+  def self.done(state, arguments)
+    task = get_record(state, arguments, Task)
+    unless task
+      Output.error "could not find task"
+      return
+    end
+    task.done = !task.done
+    Output.log "task complete #{task.done}"
+    state.ledger.save_existing_record! task
+    state.soft_reset!
+  end
+
+  def self.delete(state, arguments)
+
+  end
+
+  def self.help(state, arguments)
+
+  end
+
+  private
+  def get_priority
+    Output.puts "enter a priority"
+    if (priority = Input.gets) != ""
+      priority.to_i
+    end
+  end
+
+  def filter_tasks(tasks, arguments)
+    tasks = tasks.sort_by(&:priority).reverse
+
+    kwargs = arguments.kwargs
+
+    tasks = tasks.reverse if kwargs.key?(:priority) && (kwargs[:priority] == 'desc')
+
+    select_done_tasks = false
+
+    select_done_tasks = true if kwargs.key?(:done) && kwargs[:done]
+
+    select_done_tasks = true if arguments.string_args.any? { |s| s == :done }
+
+    tasks = if select_done_tasks
+              tasks.select(&:done)
+            else
+              tasks.reject(&:done)
+            end
+
+    filter_records(tasks, arguments)
+  end
+end
+
+module TaskPromptOld
+  module GetPriority
   end
 
   class New < Prompt
@@ -29,7 +126,7 @@ module TaskPrompt
       task = Task.new_from_parts(body, tags, priority)
       @state.ledger.save_new_record! task
 
-      Output.puts_between_lines{Output.puts_new_task task}
+      Output.puts_between_lines{ Output.puts_new_task task }
     end
   end
 
@@ -72,58 +169,45 @@ module TaskPrompt
   end
 
 
-  class List < RecordPrompt::List
+  class List < Prompt
     TITLE = "TASK LIST"
+    include RecordPrompt::FilterListRecords
+
     def process
       super
-
-      tasks = @state.ledger.records.select{|r| r.class == Task}
-      tasks = filter_records tasks
+      tasks = @state.ledger.tasks
+      tasks = filter_tasks tasks
       tasks = slice_records tasks
       @state.last_task_list = tasks.reverse
       tasks = index_records tasks
 
       Output.puts_between_lines do
-        tasks.each{|r, i| Output.puts_list_record(r, i) }
+        tasks.each{ |r, i| Output.puts_list_record(r, i) }
       end
 
       @state.soft_reset!
     end
 
-    def filter_records(tasks)
-      extract_args_hash
+    def filter_tasks(tasks)
+      tasks = tasks.sort_by(&:priority).reverse
+
+      kwargs = @state.arguments.kwargs
+
+      tasks = tasks.reverse if kwargs.key?(:priority) && (kwargs[:priority] == 'desc')
+
       select_done_tasks = false
 
-      tasks = tasks.sort_by{|r| r.priority}.reverse
+      select_done_tasks = true if kwargs.key?(:done) && kwargs[:done]
 
-      unless args_hash[:keyword_args].empty?
-        keyword_args = args_hash[:keyword_args]
-        if keyword_args.has_key? :priority
-          if keyword_args[:priority] == 'desc'
-            tasks = tasks.reverse
-          end
-        end
-        if keyword_args.has_key? :done
-          if keyword_args[:done]
-            select_done_tasks = true
-          end
-        end
-      end
+      select_done_tasks = true if @state.arguments.string_args.any? { |s| s == :done }
 
-      unless args_hash[:string_args].empty?
-        string_args = args_hash[:string_args]
-        if string_args.any? {|s| s == :done}
-          select_done_tasks = true
-        end
-      end
+      tasks = if select_done_tasks
+                tasks.select(&:done)
+              else
+                tasks.reject(&:done)
+              end
 
-      if select_done_tasks
-        tasks = tasks.select{|t| t.done}
-      else
-        tasks = tasks.reject{|t| t.done}
-      end
-
-      super tasks
+      filter_records tasks
     end
   end
 
@@ -138,7 +222,7 @@ module TaskPrompt
         return
       end
       task.done = !task.done
-      Output.log "task complete"
+      Output.log "task complete #{task.done}"
       @state.ledger.save_existing_record! task
       @state.soft_reset!
     end

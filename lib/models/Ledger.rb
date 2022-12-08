@@ -1,13 +1,18 @@
 require 'securerandom'
 require_relative './base'
+require_relative 'Task'
+require_relative 'Record'
 require_relative '../helpers/output'
 
 class Ledger < Timestamped
-  attr_reader :name, :records, :created_at, :updated_at
+  attr_reader :name, :created_at, :updated_at
+  include Writable
 
   def initialize(params)
     super params
     @name = params[:name]
+    @directory = params[:directory]
+    @file_name = @name
     @records = params[:records].map do |r|
       if r.has_key? :priority
         Task.new r
@@ -17,19 +22,32 @@ class Ledger < Timestamped
     end
   end
 
-  def self.from_name(name)
+  def self.new_from_name(name, directory)
     created_at = updated_at = Time.now
     Ledger.new({
-      name:, 
+      name:,
+      directory:,
       records: [], 
       created_at:,
       updated_at:,
     })
   end
 
+  def self.file_exists? name
+    File.exist? "#{name}.yml"
+  end
+
   def self.from_file(name)
     l = YAML.load_file("#{name}.yml", permitted_classes: [Symbol, Time], aliases: true)
     Ledger.new l
+  end
+
+  def records
+    @records.select{ |r| r.is_a? Record and not r.is_a? Task }
+  end
+
+  def tasks
+    @records.select{ |r| r.class == Task }
   end
 
   def to_hash
@@ -53,12 +71,12 @@ class Ledger < Timestamped
   end
 
   def save_existing_record!(record)
-    @records = @records.map{|r| r.id === record.id ? record : r}
+    @records = @records.map{|r| r.id == record.id ? record : r}
     write!
   end
 
   def delete_record!(record_id)
-    @records = @records.select{|r| r.id === record_id}
+    @records = @records.select{|r| r.id == record_id}
     write!
   end
 end
