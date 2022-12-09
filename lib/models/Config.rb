@@ -3,12 +3,9 @@ require 'yaml'
 
 class Config
   # eventual destination for user settings
-  CONFIG_FILE_NAME = 'config'
   DEFAULT_BASE_DIRECTORY = '../rubert-files'
 
   attr_accessor :base_directory, :last_ledger_name
-
-  include Writable
 
   def initialize(params={})
     @file_name = CONFIG_FILE_NAME
@@ -16,8 +13,16 @@ class Config
     @last_ledger_name = params[:last_ledger_name]
   end
 
+  def self.ensure
+
+  end
+
   def self.from_file
-    new(YAML.load_file("#{CONFIG_FILE_NAME}.yml"))
+    new(Persistence.load_config)
+  end
+
+  def write!
+    Persistence.write_config!(to_hash)
   end
 
   def self.file_exists?

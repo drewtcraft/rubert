@@ -7,7 +7,7 @@ class Arguments
     # arg_string comes in the form of:
     # <prompt-type> <command> <extra-arguments...>
     # ex. task list created=desc done
-
+    @arg_string = arg_string
     @prompt = nil
     @command = nil
     @kwargs = {}
@@ -17,9 +17,37 @@ class Arguments
     extract_args! arg_string
   end
 
+  def to_s
+    "Arguments: #{@arg_string}"
+  end
+
+  def parse_command(command)
+    case command
+    when CommandRegExp::NEW
+      :create
+    when CommandRegExp::SHOW
+      :show
+    when CommandRegExp::LIST
+      :list
+    when CommandRegExp::EDIT
+      :edit
+    when CommandRegExp::DELETE
+      :delete
+    when CommandRegExp::SWITCH
+      :switch
+    when CommandRegExp::DONE
+      :done
+    when CommandRegExp::HELP
+      :help
+    else
+      :show
+    end
+  end
+
   def extract_args!(arg_string)
     split_string = arg_string.split(' ').compact
-    @prompt, @command = split_string[0..2]
+    @prompt, command_str = split_string[0..2]
+    @command = parse_command command_str
 
     split_string.drop(2).each do |argument|
       case argument

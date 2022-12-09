@@ -68,18 +68,14 @@ class RecordPrompt < Prompt
 
   protected
 
-  def self.get_body(msg, multi = true)
+  def self.get_body(msg)
     Output.puts msg
-    if multi
-      Input.multiline_gets
-    else
-      Input.gets
-    end
-    end
+    Input.gets
+  end
 
   def self.get_tags
     Output.puts "enter comma-separated tags:"
-    tags = Input.one_line_gets
+    tags = Input.gets
     tags.split(',')
         .map(&:strip)
         .reject { |t| t == '' }

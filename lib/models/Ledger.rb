@@ -6,7 +6,6 @@ require_relative '../helpers/output'
 
 class Ledger < Timestamped
   attr_reader :name, :created_at, :updated_at
-  include Writable
 
   def initialize(params)
     super params
@@ -34,11 +33,11 @@ class Ledger < Timestamped
   end
 
   def self.file_exists? name
-    File.exist? "#{name}.yml"
+    Persistence.ledger_exists? name
   end
 
   def self.from_file(name)
-    l = YAML.load_file("#{name}.yml", permitted_classes: [Symbol, Time], aliases: true)
+    l = Persistence.load_ledger name
     Ledger.new l
   end
 

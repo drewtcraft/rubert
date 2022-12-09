@@ -10,11 +10,3 @@ class Timestamped
     @updated_at = Time.now
   end
 end
-
-module Writable
-  def write!
-    File.open("#{@file_name}.yml", 'w') do |h|
-      h.write to_hash.to_yaml
-    end
-  end
-end
