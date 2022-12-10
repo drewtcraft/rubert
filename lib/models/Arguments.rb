@@ -8,6 +8,7 @@ module CommandRegExp
   SWITCH = /^sw(?:itch)?$/
   DONE = /^do(?:ne)?$/
   ENSURE = /^ensure$/
+  BACKUP = /^backup$/
 end
 
 class Arguments
@@ -53,6 +54,8 @@ class Arguments
       :help
     when CommandRegExp::ENSURE
       :ensure
+    when CommandRegExp::BACKUP
+      :backup
     else
       :show
     end

@@ -20,6 +20,10 @@ class LedgerPrompt < Prompt
     end
   end
 
+  def self.backup(state, arguments)
+    Persistence.backup_ledgers! state.config.base_directory
+  end
+
   def self.show(state, arguments)
     ledger_name = get_ledger_name(state, arguments)
     unless Ledger.file_exists?(ledger_name, state.config.base_directory)
