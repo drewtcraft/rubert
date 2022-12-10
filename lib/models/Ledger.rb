@@ -32,13 +32,17 @@ class Ledger < Timestamped
     })
   end
 
-  def self.file_exists? name
-    Persistence.ledger_exists? name
+  def self.file_exists?(name, directory)
+    Persistence.ledger_exists?(name, directory)
   end
 
-  def self.from_file(name)
-    l = Persistence.load_ledger name
+  def self.from_file(name, directory)
+    l = Persistence.load_ledger(name, directory)
     Ledger.new l
+  end
+
+  def write!
+    Persistence.write_ledger!(to_hash, @name, @directory)
   end
 
   def records
@@ -56,12 +60,6 @@ class Ledger < Timestamped
       created_at: @created_at,
       updated_at: @updated_at,
     }
-  end
-
-  def write!
-    File.open("#{@name}.yml", 'w') do |h| 
-      h.write self.to_hash.to_yaml
-    end
   end
 
   def save_new_record!(record)

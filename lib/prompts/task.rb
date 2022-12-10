@@ -6,7 +6,7 @@ class TaskPrompt < RecordPrompt
   REGEXP = /^t(?:ask)?/.freeze
 
   def self.create(state, arguments)
-    body = get_body "enter new task:", false
+    body = get_body "enter new task:"
     tags = get_tags
     priority = get_priority
     priority ||= Task::DEFAULT_PRIORITY
@@ -84,7 +84,7 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.filter_tasks(tasks, arguments)
-    tasks = tasks.sort_by(&:priority).reverse
+    tasks = tasks.sort_by(&:priority)
 
     kwargs = arguments.kwargs
 

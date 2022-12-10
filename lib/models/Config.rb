@@ -1,4 +1,5 @@
 require_relative 'base'
+require_relative '../helpers/Persistence'
 require 'yaml'
 
 class Config
@@ -8,13 +9,8 @@ class Config
   attr_accessor :base_directory, :last_ledger_name
 
   def initialize(params={})
-    @file_name = CONFIG_FILE_NAME
     @base_directory = params[:base_directory]
     @last_ledger_name = params[:last_ledger_name]
-  end
-
-  def self.ensure
-
   end
 
   def self.from_file
@@ -26,7 +22,7 @@ class Config
   end
 
   def self.file_exists?
-    File.exist? "#{CONFIG_FILE_NAME}.yml"
+    Persistence.config_exists?
   end
 
   def to_hash

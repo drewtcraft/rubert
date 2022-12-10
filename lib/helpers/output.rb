@@ -79,6 +79,12 @@ module Output
     puts t.created_at
   end
 
+  def self.print_title
+    Output.clear
+    Output.puts_in_box "RUBERT"
+    Output.puts_newline
+  end
+
   def self.puts_prompt_title(t)
     puts Format.gray Format.underline t
   end

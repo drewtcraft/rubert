@@ -1,30 +1,8 @@
 require_relative '../helpers/output'
 require_relative 'utils'
 
-class Prompt
-  def self.translate_command(command)
-    case command
-    when CommandRegExp::NEW
-      :create
-    when CommandRegExp::SHOW
-      :show
-    when CommandRegExp::LIST
-      :list
-    when CommandRegExp::EDIT
-      :edit
-    when CommandRegExp::DELETE
-      :delete
-    when CommandRegExp::SWITCH
-      :switch
-    when CommandRegExp::DONE
-      :done
-    when CommandRegExp::HELP
-      :help
-    else
-      :show
-    end
-  end
 
+class Prompt
   def self.confirmed?(msg)
     Output.puts "#{msg} (y/n)"
     Input.gets == 'y'
