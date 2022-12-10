@@ -30,15 +30,17 @@ class LedgerPrompt < Prompt
       Output.error "ledger \"#{ledger_name}\" does not exist"
     end
     ledger = Ledger.from_file(ledger_name, state.config.base_directory)
+    # binding.break
     Output.puts_underlined ledger_name
     Output.puts 'last records'
+    # TODO populate last record list with this!
+    # then le show can be followed with rec or task command
     Output.puts_between_lines do
-      ledger.records[-3..].each { |r| Output.puts "#{r.body}" }
-      state.config.write!
+      ledger.records.last(3).reverse.each { |r| Output.puts "#{r.body}" }
     end
     Output.puts 'last tasks'
     Output.puts_between_lines do
-      ledger.tasks[-4..].each { |t| Output.puts t.body}
+      ledger.tasks.last(4).reverse.each { |t| Output.puts t.body}
     end
   end
 
@@ -52,7 +54,7 @@ class LedgerPrompt < Prompt
 
     state.ledger = if Ledger.file_exists?(ledger_name, state.config.base_directory)
                      Output.log "ledger \"#{ledger_name}\" loaded from memory"
-                     Ledger.new_from_name(ledger_name, state.config.base_directory)
+                     Ledger.from_file(ledger_name, state.config.base_directory)
                    else
                      new_ledger = Ledger.new_from_name(ledger_name, state.config.base_directory)
                      new_ledger.write!
@@ -66,10 +68,10 @@ class LedgerPrompt < Prompt
                  .select { |f| f.match(/\.yml$/) }
                  .map{ |f| f.split('.')[0..-2].join('') }
 
-    state.last_ledger_list = ledgers
+    state.last_ledger_list = ledgers.reverse
 
     Output.puts_between_lines do
-      ledgers.each_with_index { |l, i| Output.puts_list_ledger(l, i) }
+      ledgers.reverse.each_with_index.to_a.reverse.each { |l, i| Output.puts_list_ledger(l, i) }
     end
   end
 

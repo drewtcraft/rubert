@@ -38,7 +38,6 @@ class TaskPrompt < RecordPrompt
     task.body = Input.editor_edits task.body
     task.priority = get_priority
     state.ledger.save_existing_record! task
-    state.soft_reset!
   end
 
   def self.list(state, arguments)
@@ -51,8 +50,6 @@ class TaskPrompt < RecordPrompt
     Output.puts_between_lines do
       tasks.each{ |r, i| Output.puts_list_record(r, i) }
     end
-
-    state.soft_reset!
   end
 
   def self.done(state, arguments)
@@ -64,7 +61,6 @@ class TaskPrompt < RecordPrompt
     task.done = !task.done
     Output.log "task complete #{task.done}"
     state.ledger.save_existing_record! task
-    state.soft_reset!
   end
 
   def self.delete(state, arguments)

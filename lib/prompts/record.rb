@@ -36,7 +36,6 @@ class RecordPrompt < Prompt
     end
     record.body = Input.editor_edits record.body
     state.ledger.save_existing_record! record
-    state.soft_reset!
   end
 
   def self.list(state, arguments)
@@ -49,8 +48,6 @@ class RecordPrompt < Prompt
     Output.puts_between_lines do
       records.each{ |r, i| Output.puts_list_record(r, i) }
     end
-
-    state.soft_reset!
   end
 
   def self.delete(state, arguments)
@@ -126,16 +123,16 @@ class RecordPrompt < Prompt
     end
 
     if kwargs.key? :first
-      records = records[0..kwargs[:first].to_i]
+      records = records.take(kwargs[:first].to_i)
     elsif kwargs.key? :last
-      records = records[(kwargs[:last].to_i * -1)..]
+      records = records.last((kwargs[:last].to_i * -1))
     end
 
     string_args = arguments.string_args
     if string_args.any? { |s| s == :first }
-      records = records[0..10]
+      records = records.take(10)
     elsif string_args.any? { |s| s == :last }
-      records = records[-11..]
+      records = records.last(10)
     end
 
     records

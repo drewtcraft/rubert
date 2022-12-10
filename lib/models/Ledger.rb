@@ -74,7 +74,7 @@ class Ledger < Timestamped
   end
 
   def delete_record!(record_id)
-    @records = @records.select{|r| r.id == record_id}
+    @records = @records.select{|r| r.id != record_id}
     write!
   end
 end

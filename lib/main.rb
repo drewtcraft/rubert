@@ -16,7 +16,7 @@ def init
               'ledger ensure'
             else
               Output.puts_newline
-              Output.puts "enter command:"
+              Output.puts "<#{state.ledger.name}> enter command:"
               Input.gets
             end
 

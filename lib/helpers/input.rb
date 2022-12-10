@@ -6,8 +6,8 @@ module Input
   private_constant :TEMP_FILE_NAME
 
   def self.gets
-    if (text = standard_gets) == 'editor'
-      editor_gets
+    if (text = standard_gets) == "editor\n"
+      return editor_gets
     end
     text.chomp
   end

@@ -16,17 +16,6 @@ class State
     @last_task_list = nil
   end
 
-  def get_resource_by_index(type, index)
-    case type
-    when :ledger
-      @last_ledger_list[index]
-    when :record
-      @last_record_list[index]
-    when :task
-      @last_task_list[index]
-    end
-  end
-
   def soft_reset!
     @last_ledger_list = nil
     @last_record_list = nil
