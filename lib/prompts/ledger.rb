@@ -101,18 +101,12 @@ class LedgerPrompt < Prompt
 
   private
   def self.get_ledger_name(state, arguments)
-    string_args, int_args = arguments.string_args, arguments.int_args
-    ledger_name = if int_args.any?
-                    index = int_args.first
-                    Output.log "looking for ledger with list index: #{index}"
-                    state.get_resource_by_index(:ledger, index)
-                  elsif string_args.any?
-                    string_args.first
-                  else
-                    state.ledger.name
-                  end
-
-
-
+    if arguments.int_args.any?
+      state.last_ledger_list[arguments.int_args.first]
+    elsif arguments.string_args.any?
+      arguments.string_args.first
+    else
+      state.ledger.name
+    end
   end
 end

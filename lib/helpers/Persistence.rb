@@ -4,9 +4,7 @@ module Persistence
   CONFIG_FILE_NAME = 'config'
 
   def self.backup_ledgers!(directory)
-    system("pushd #{directory}")
-    system("git add . && git commit -m 'backup' && git push")
-    system('popd')
+    system("pushd #{directory}; git add . && git commit -m 'backup' && git push; popd")
   end
 
   def self.load_config_if_exists
