@@ -30,6 +30,7 @@ class LedgerPrompt < Prompt
     Output.puts 'last records'
     Output.puts_between_lines do
       ledger.records[-3..].each { |r| Output.puts "#{r.body}" }
+      state.config.write!
     end
     Output.puts 'last tasks'
     Output.puts_between_lines do

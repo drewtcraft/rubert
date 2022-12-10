@@ -57,6 +57,7 @@ module Persistence
 
   def self.write!(file_name, hash)
     file_name = ensure_extension file_name
+    puts "writing to #{file_name}"
     File.open(file_name, 'w') do |h|
       h.write hash.to_yaml
     end

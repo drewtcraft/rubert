@@ -56,6 +56,7 @@ class Ledger < Timestamped
   def to_hash
     {
       name: @name,
+      directory: @directory,
       records: @records.map{|r| r.to_hash},
       created_at: @created_at,
       updated_at: @updated_at,
