@@ -64,7 +64,9 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.delete(state, arguments)
-
+    record = get_record(state, arguments, Task)
+    return unless record && confirmed?( "delete record?")
+    state.ledger.delete_record! record.id
   end
 
   def self.help(state, arguments)

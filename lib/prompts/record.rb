@@ -34,7 +34,8 @@ class RecordPrompt < Prompt
       Output.error "could not find record"
       return
     end
-    record.body = Input.editor_edits record.body
+    body = Input.editor_edits record.body
+    record.update(body:)
     state.ledger.save_existing_record! record
   end
 

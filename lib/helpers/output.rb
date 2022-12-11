@@ -90,6 +90,7 @@ module Output
   end
 
   def self.puts_list_record(r, i)
+    # TODO split this out so I can color my tasks
     body = if r.body[0..LIST_RECORD_TRUNCATE].match("\n")
       r.body[0..LIST_RECORD_TRUNCATE].split("\n")[0]
     elsif r.body.length > LIST_RECORD_TRUNCATE
@@ -97,7 +98,17 @@ module Output
     else
       r.body
     end
-    puts  " " + ("%02d" % i) + "#{r.class == Task ? " | p#{("%02d" % r.priority)} |" : ""} " + "#{body}".ljust(LIST_RECORD_TRUNCATE + 3) + (Format.gray "#{r.created_at.strftime(TIME_DATE_FORMAT)}")
+    s = " #{i} | #{body}".ljust(LIST_RECORD_TRUNCATE + 3) +"#{r.class == Task ? " p#{("%02d" % r.priority)}" : ""} " + (Format.gray "#{r.created_at.strftime(TIME_DATE_FORMAT)}")
+    if r.class == Task
+      s = if r.priority > 3 && r.priority < 7
+            Format.magenta s
+          elsif r.priority > 7
+            Format.red s
+          else
+            Format.cyan s
+          end
+    end
+    puts s
   end
 
   def self.puts_list_ledger(l, i)

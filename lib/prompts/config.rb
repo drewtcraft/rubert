@@ -25,6 +25,7 @@ class ConfigPrompt < Prompt
     base_directory = '../rubert-ledgers/' if base_directory == ''
     unless File.exist? base_directory
       # TODO inject README into directory
+      # git init
       Dir.mkdir base_directory
     end
 
