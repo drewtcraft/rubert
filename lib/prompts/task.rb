@@ -18,7 +18,7 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.show(state, arguments)
-    task = get_record(state, arguments, Task)
+    task = get_record(state, arguments, :task)
 
     if task
       Output.puts_dashes
@@ -30,13 +30,32 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.edit(state, arguments)
-    task = get_record(state, arguments, Task)
+    task = get_record(state, arguments, :task)
     unless task
       Output.error "could not find task"
       return
     end
-    task.body = Input.editor_edits task.body
-    task.priority = get_priority
+
+    field = arguments.string_args.first
+    unless field
+      # TODO "help" here
+      Output.error "field required"
+      return
+    end
+    case field
+    when :body # TODO abstract this in recordprompt
+      body = get_edited_body task
+      task.update(body:)
+    when :tags
+      tags = get_edited_tags task
+      task.update(tags:)
+    when :proiority
+      priority = get_edited_priority task
+      task.update(priority:)
+    else
+      #TODO
+      Output.error "bad input: body or tags"
+    end
     state.ledger.save_existing_record! task
   end
 
@@ -53,7 +72,7 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.done(state, arguments)
-    task = get_record(state, arguments, Task)
+    task = get_record(state, arguments, :task)
     unless task
       Output.error "could not find task"
       return
@@ -64,8 +83,8 @@ class TaskPrompt < RecordPrompt
   end
 
   def self.delete(state, arguments)
-    record = get_record(state, arguments, Task)
-    return unless record && confirmed?( "delete record?")
+    record = get_record(state, arguments, :task)
+    return unless record && confirmed?( "delete task?")
     state.ledger.delete_record! record.id
   end
 
@@ -73,7 +92,15 @@ class TaskPrompt < RecordPrompt
 
   end
 
+  def self.duplicate(state, arguments)
+
+  end
+
   private
+  def self.get_edited_priority(task)
+    Input.editor_edits("#{task.priority}").strip.to_i
+  end
+
   def self.get_priority
     Output.puts "enter a priority"
     if (priority = Input.gets) != ""

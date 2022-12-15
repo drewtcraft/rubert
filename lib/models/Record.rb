@@ -2,7 +2,8 @@ require 'securerandom'
 require_relative './base'
 
 class Record < Timestamped
-  attr_reader :id, :body, :tags
+  attr_accessor :body, :tags
+  attr_reader :id
 
   def initialize(params)
     super 

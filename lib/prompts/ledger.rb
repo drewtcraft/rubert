@@ -32,15 +32,20 @@ class LedgerPrompt < Prompt
     ledger = Ledger.from_file(ledger_name, state.config.base_directory)
     # binding.break
     Output.puts_underlined ledger_name
-    Output.puts 'last records'
-    # TODO populate last record list with this!
-    # then le show can be followed with rec or task command
-    Output.puts_between_lines do
-      ledger.records.last(3).reverse.each { |r| Output.puts "#{r.body}" }
+    Output.puts_newline
+
+    if ledger.records.any?
+      Output.puts 'last records'
+      Output.puts_between_lines do
+        ledger.records.last(3).reverse.each { |r| Output.puts "#{r.body}" }
+      end
+      Output.puts_newline
     end
-    Output.puts 'last tasks'
-    Output.puts_between_lines do
-      ledger.tasks.last(4).reverse.each { |t| Output.puts t.body}
+    if ledger.tasks.any?
+      Output.puts 'last tasks'
+      Output.puts_between_lines do
+        ledger.tasks.last(4).reverse.each { |t| Output.puts "- #{t.body}"}
+      end
     end
   end
 
@@ -70,6 +75,8 @@ class LedgerPrompt < Prompt
 
     state.last_ledger_list = ledgers.reverse
 
+    Output.puts_newline
+    Output.puts_underlined 'ledgers'
     Output.puts_between_lines do
       ledgers.reverse.each_with_index.to_a.reverse.each { |l, i| Output.puts_list_ledger(l, i) }
     end

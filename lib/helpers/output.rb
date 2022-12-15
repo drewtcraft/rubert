@@ -23,7 +23,7 @@ end
 
 module Output
   INDENT_LEVEL = 2
-  LIST_RECORD_TRUNCATE = 30
+  LIST_RECORD_TRUNCATE = 60
   TIME_DATE_FORMAT = '%m/%d/%y %I:%M%p'
 
   private_constant :INDENT_LEVEL, :LIST_RECORD_TRUNCATE, :TIME_DATE_FORMAT
@@ -112,7 +112,7 @@ module Output
   end
 
   def self.puts_list_ledger(l, i)
-    puts "#{i} | #{l.split('.')[0]}"
+    puts " #{i} | #{l.split('.')[0]}"
   end
 
   def self.puts_full_record(r)

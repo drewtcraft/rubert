@@ -35,6 +35,9 @@ class Arguments
   end
 
   def parse_command(command)
+    # tests string command input against regexps and returns a symbol
+    # return value is used in Prompt.send <command-symbol>, state, arguments
+
     case command
     when CommandRegExp::NEW
       :create

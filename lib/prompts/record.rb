@@ -2,6 +2,9 @@ require_relative './base'
 require_relative './utils'
 require_relative '../models/Record'
 
+# TODO: record page count=10 desc
+# ^ display 10 records, then (y/n) for next page
+
 class RecordPrompt < Prompt
   REGEXP = /^rec(?:ord)?/.freeze
   
@@ -31,11 +34,25 @@ class RecordPrompt < Prompt
   def self.edit(state, arguments)
     record = get_record(state, arguments)
     unless record
-      Output.error "could not find record"
       return
     end
-    body = Input.editor_edits record.body
-    record.update(body:)
+    field = arguments.string_args.first
+    unless field
+      # TODO "help" here
+      Output.error "field required"
+      return
+    end
+    case field
+    when :body
+      body = get_edited_body record
+      record.update(body:)
+    when :tags
+      tags = get_edited_tags record
+      record.update(tags:)
+    else
+      #TODO
+      Output.error "bad input: body or tags"
+    end
     state.ledger.save_existing_record! record
   end
 
@@ -47,7 +64,7 @@ class RecordPrompt < Prompt
     records = index_records records
 
     Output.puts_between_lines do
-      records.each{ |r, i| Output.puts_list_record(r, i) }
+      records.each{ |r, i| Output.puts_list_record r, i }
     end
   end
 
@@ -66,44 +83,44 @@ class RecordPrompt < Prompt
 
   protected
 
+  def self.get_edited_body(record)
+    Input.editor_edits record.body
+  end
+
+  def self.get_edited_tags(record)
+    str_tags = Input.editor_edits record.tags.join(', ')
+    parse_string_tags tags
+  end
+
   def self.get_body(msg)
     Output.puts msg
     Input.gets
   end
 
-  def self.get_tags
-    Output.puts "enter comma-separated tags:"
-    tags = Input.gets
-    tags.split(',')
+  def self.parse_string_tags(str_tags)
+    str_tags.split(',')
         .map(&:strip)
         .reject { |t| t == '' }
   end
 
-  def self.get_record(state, arguments, t = Record)
-    # TODO this whole method sucks, should pass a symbol and use state.get_resource_at_index
-    is_record = t == Record
+  def self.get_tags
+    Output.puts "enter comma-separated tags:"
+    tags = Input.gets
+    parse_string_tags tags
+  end
 
-    string_args, int_args = arguments.string_args, arguments.int_args
-    record = if int_args.any?
-               index = int_args.first
+  def self.get_record(state, arguments, t = :record)
+    record = if arguments.int_args.any?
+               index = arguments.int_args.first
                Output.log "looking for #{t} with index: #{index}"
-               # TODO if state.has_last_record_list
-               is_record ? state.last_record_list[index] : state.last_task_list[index]
-             elsif string_args.any?
-               id = string_args.first
-               records = is_record ? state.ledger.records : state.ledger.tasks
-               case id
-               when /first/
-                 records.first
-               when /last/
-                 records.last
-               else
-                 Output.log "looking for #{t} with ID: #{id}"
-                 records.find{ |r| r.id == id }
-               end
+               t == :record ? state.last_record_list[index] : state.last_task_list[index]
              end
 
-    Output.log "#{t} found!" if record
+    if record
+      Output.log "#{t} found!" if record
+    else
+      Output.error "could not find record"
+    end
 
     record
   end

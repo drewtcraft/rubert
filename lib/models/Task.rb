@@ -34,4 +34,10 @@ class Task < Record
       **super,
     }
   end
+
+  def duplicate
+    hash = to_hash
+    hash[:done] = true
+    new(hash)
+  end
 end
