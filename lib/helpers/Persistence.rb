@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'singleton'
 
 module Persistence
@@ -28,7 +30,7 @@ module Persistence
 
   def self.load_ledger(ledger_name, directory)
     file_name = smash_paths(directory, ledger_name)
-    load(file_name, {permitted_classes: [Symbol, Time], aliases: true})
+    load(file_name, { permitted_classes: [Symbol, Time], aliases: true })
   end
 
   def self.write_ledger!(hash, ledger_name, directory)
@@ -46,14 +48,12 @@ module Persistence
     delete! file_name
   end
 
-  private
-
   def self.smash_paths(*args)
     args.join('/').sub(%r{//}, '/')
   end
 
   def self.ensure_extension(name)
-    name = "#{name}.yml" if name.length <= 4 || name[-3..-1] != "yml"
+    name = "#{name}.yml" if name.length <= 4 || name[-3..] != 'yml'
     name
   end
 

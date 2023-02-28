@@ -36,8 +36,6 @@ class Task < Record
   end
 
   def duplicate
-    hash = to_hash
-    hash[:done] = true
-    new(hash)
+    new({**to_hash, done: false})
   end
 end

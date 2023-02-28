@@ -12,6 +12,7 @@ class Ledger < Timestamped
     @name = params[:name]
     @directory = params[:directory]
     @file_name = @name
+    @pinned_records = params[:pinned_records]
     @records = params[:records].map do |r|
       if r.has_key? :priority
         Task.new r
@@ -26,7 +27,8 @@ class Ledger < Timestamped
     Ledger.new({
       name:,
       directory:,
-      records: [], 
+      records: [],
+      pinned_records: [],
       created_at:,
       updated_at:,
     })
@@ -58,6 +60,7 @@ class Ledger < Timestamped
       name: @name,
       directory: @directory,
       records: @records.map{|r| r.to_hash},
+      pinned_records: @pinned_records,
       created_at: @created_at,
       updated_at: @updated_at,
     }
@@ -75,6 +78,16 @@ class Ledger < Timestamped
 
   def delete_record!(record_id)
     @records = @records.select{|r| r.id != record_id}
+    write!
+  end
+
+  def pin_record!(record_id)
+    @pinned_records << record_id
+    write!
+  end
+
+  def unpin_record!(record_id)
+    @pinned_records = @pinned_records.reject{|r_id| r_id == record_id}
     write!
   end
 end

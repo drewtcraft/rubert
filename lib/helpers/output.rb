@@ -29,8 +29,11 @@ module Output
   private_constant :INDENT_LEVEL, :LIST_RECORD_TRUNCATE, :TIME_DATE_FORMAT
 
   def self.puts(s)
-    return unless s
-    standard_puts s
+    standard_puts s if s
+  end
+
+  def self.pad_dashed(s, l=1)
+    puts ' ' * (l * 2) + s
   end
 
   def self.puts_dashes(l=20)
@@ -90,7 +93,6 @@ module Output
   end
 
   def self.puts_list_record(r, i)
-    # TODO split this out so I can color my tasks
     body = if r.body[0..LIST_RECORD_TRUNCATE].match("\n")
       r.body[0..LIST_RECORD_TRUNCATE].split("\n")[0]
     elsif r.body.length > LIST_RECORD_TRUNCATE
@@ -126,4 +128,33 @@ module Output
     yield
     puts_dashes
   end
+
+  def self.indent_print(printer, indent=-1)
+    yield(printer, indent + 1)
+  end
 end
+
+
+# Output.indent_print(puts) do |printer, indenter|
+#   printer 'print a line'
+#   indenter do |printer, indenter|
+#     printer 'doing'
+#   end
+# end
+
+# def print_tree(print_leaf, open_branch, indent)
+#   yield print_leaf, open_branch
+# end
+#
+# print_tree do |print_leaf, open_branch|
+#   print_leaf 'here is a leaf'
+#   open_branch do |p, o|
+#     p 'o'
+#     o {|p, o| p o }
+#   end
+# end
+#
+# print_tree do |printer|
+#   printer.leaf 'x'
+#   printer.branch {|p| p.leaf 'x'}
+# end

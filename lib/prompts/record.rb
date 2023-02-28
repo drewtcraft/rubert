@@ -50,7 +50,6 @@ class RecordPrompt < Prompt
       tags = get_edited_tags record
       record.update(tags:)
     else
-      #TODO
       Output.error "bad input: body or tags"
     end
     state.ledger.save_existing_record! record
@@ -78,7 +77,55 @@ class RecordPrompt < Prompt
 
   def self.help(state, arguments)
     Output.puts 'Record help'
+    Output.puts_newline
+    Output.puts 'INVOCATION:'
+    Output.puts_newline
+    Output.pad_dashed 'rec, record'
+    Output.puts_newline
+    Output.puts 'COMMANDS:'
+    Output.puts_newline
+    Output.pad_dashed 'new, list, edit, show, del, help'
+    Output.puts_newline
+    Output.puts_newline
+    Output.puts 'EXAMPLES:'
+    Output.puts_newline
+    Output.pad_dashed '"rec help list" - Print info about the "list" command.'
+    Output.pad_dashed '"rec list tags=code" - Print list of records tagged "code".'
+    Output.puts_newline
+    Output.pad_dashed 'NEW'
+    Output.puts_newline
+    Output.pad_dashed 'Create new record for current ledger.', 2
+    Output.puts_newline
+    Output.pad_dashed 'EXAMPLES:', 2
+    Output.pad_dashed '"rec new"', 3
+    Output.pad_dashed '"record new"', 3
+    Output.puts_newline
+    Output.pad_dashed 'LIST'
+    Output.puts_newline
+    Output.pad_dashed 'Print a list of records from the current ledger.', 2
+    Output.puts_newline
+    Output.pad_dashed 'With no options, prints the 5 most recent records.', 2
+    Output.pad_dashed 'An index is printed with each record which can be used', 2
+    Output.pad_dashed 'to select it with other commands like "edit" and "del".', 2
+    Output.puts_newline
+    Output.pad_dashed 'OPTIONS:', 2
+    Output.pad_dashed 'created=(asc|desc)', 3
+    Output.pad_dashed 'updated=(asc|desc)', 3
+    Output.pad_dashed 'first', 3
+    Output.pad_dashed 'last', 3
+    Output.pad_dashed 'tags=a,b,c', 3
+    Output.puts_newline
+    Output.pad_dashed 'EXAMPLES:', 2
+    Output.pad_dashed '"rec list"', 3
+    Output.pad_dashed '"rec list created=desc" -- get oldest 5 records', 3
+    Output.pad_dashed '"rec list last" -- get oldest record', 3
+    Output.pad_dashed '"rec list tags=code,school" -- get all records tagged code and school', 3
+    Output.puts_newline
+  end
 
+  def self.pin(state, arguments)
+    record = get_record(state, arguments)
+    state.ledger.pin_record()
   end
 
   protected
@@ -137,7 +184,7 @@ class RecordPrompt < Prompt
 
     if kwargs.key? :tags
       tags = kwargs[:tags]
-      records = records.select { |r| (r.tags & tags).length == tags.length }
+      records = records.select { |r| (r.tags) }
     end
 
     if kwargs.key? :first

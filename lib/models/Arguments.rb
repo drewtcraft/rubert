@@ -9,6 +9,8 @@ module CommandRegExp
   DONE = /^do(?:ne)?$/
   ENSURE = /^ensure$/
   BACKUP = /^backup$/
+  PIN = /^pin$/
+  UNPIN = /^unpin$/
 end
 
 class Arguments
@@ -59,6 +61,10 @@ class Arguments
       :ensure
     when CommandRegExp::BACKUP
       :backup
+    when CommandRegExp::PIN
+      :pin
+    when CommandRegExp::UNPIN
+      :unpin
     else
       :show
     end
